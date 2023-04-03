@@ -1,4 +1,33 @@
 import streamlit as st
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+# Función para crear el archivo PDF
+def crear_pdf_rubrica(pesos, criterios):
+    archivo_pdf = "rubrica.pdf"
+    doc = SimpleDocTemplate(archivo_pdf, pagesize=letter)
+
+    data = [["Criterio", "Peso", "Descripción"]]
+    for criterio, peso in pesos.items():
+        data.append([criterio, f"{peso}%", criterios[criterio]])
+
+    table = Table(data)
+
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 14),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+        ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+        ("GRID", (0, 0), (-1, -1), 1, colors.black)
+    ]))
+
+    doc.build([table])
+
+    return archivo_pdf
 
 # Título de la aplicación
 st.title("RubriMaker")
@@ -39,13 +68,13 @@ if st.button("Generar rúbrica"):
         for criterio, peso in pesos.items():
             st.write(f"{criterio}: {peso}%")
 
-# Guardar rúbrica en un archivo
-if st.button("Guardar rúbrica"):
+# Descargar rúbrica en PDF
+if st.button("Descargar rúbrica en PDF"):
     total = sum(pesos.values())
     if total != 100:
         st.error("La suma de los pesos debe ser igual al 100%.")
     else:
-        with open("rubrica.txt", "w") as f:
-            for criterio, peso in pesos.items():
-                f.write(f"{criterio}: {peso}%\n")
-        st.success("Rúbrica guardada en rubrica.txt")
+        archivo_pdf = crear_pdf_rubrica(pesos, criterios)
+        with open(archivo_pdf, "rb") as f:
+            pdf_data = f.read()
+        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")

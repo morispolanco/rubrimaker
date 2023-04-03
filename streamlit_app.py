@@ -79,12 +79,3 @@ if st.button("Descargar rúbrica en PDF"):
             pdf_data = f.read()
         st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")
 
-if st.button("Descargar rúbrica en PDF"):
-    total = sum(pesos.values())
-    if total != 100:
-        st.error("La suma de los pesos debe ser igual al 100%.")
-    else:
-        archivo_pdf = crear_pdf_rubrica(pesos, criterios)
-        with open(archivo_pdf, "rb") as f:
-            pdf_data = f.read()
-        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")

@@ -69,5 +69,6 @@ if uploaded_file is not None:
         if total != 100:
             st.error("La suma de los pesos debe ser igual al 100%.")
         else:
-            calificaciones = calificar_ensayo(ensayo, pesos keys(), criterios)
-st.write(calificaciones)
+            calificaciones = calificar_ensayo(ensayo, pesos.keys(), criterios)
+            st.write(calificaciones)
+

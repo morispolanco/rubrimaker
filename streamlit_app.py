@@ -6,7 +6,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 def crear_pdf_rubrica(pesos, criterios):
     archivo_pdf = "rubrica.pdf"
-    doc = SimpleDocTemplate(archivo_pdf, pagesize=landscape(letter))
+    doc = SimpleDocTemplate(archivo_pdf, pagesize=letter)
 
     styles = getSampleStyleSheet()
     style = styles["BodyText"]

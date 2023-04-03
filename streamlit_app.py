@@ -10,7 +10,30 @@ def crear_pdf_rubrica(pesos, criterios):
     archivo_pdf = "rubrica.pdf"
     doc = SimpleDocTemplate(archivo_pdf, pagesize=letter)
 
-    # El resto del código de la función no cambia...
+    data = [["Criterio", "Peso", "Punteo", "Descripción"]]
+    for criterio, peso in pesos.items():
+        data.append([criterio, f"{peso}%", "", criterios[criterio]])
+
+    table = Table(data, colWidths=[1.5 * inch, 1 * inch, 1 * inch, 2.5 * inch])
+
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 12),
+        ('TOPPADDING', (0, 1), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+    ]))
+
+    doc.build([table])
+
+    return archivo_pdf
 
 # Función para calificar ensayos utilizando GPT
 def calificar_ensayo(ensayo, rubrica, criterios):

@@ -89,4 +89,15 @@ if uploaded_file is not None:
     if st.button("Calificar ensayo", key="calificar_ensayo"):
         total = sum(pesos.values())
         if total != 100:
-            st.error("La suma de los pesos debe ser igual al 
+            st.error("La suma de los pesos debe ser igual al 100%.")
+        else:
+            calificaciones = calificar_ensayo(ensayo, pesos.keys(), criterios)
+            st.write(calificaciones)
+
+if st.button("Descargar rúbrica en PDF"):
+    total = sum(pesos.values())
+    if total != 100:
+        st.error("La suma de los pesos debe ser igual al 100%.")
+    else:
+        archivo_pdf = crear_pdf_rubrica(pesos, criterios)
+        st.download_button("Descargar PDF", archivo_pdf, "rubrica.pdf", "application/pdf")

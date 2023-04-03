@@ -50,7 +50,7 @@ criterios = {
     "Participación": "¿El estudiante ha participado activamente en el proyecto y ha contribuido significativamente al trabajo en equipo?"
 }
 
-criterios_seleccionados = st.multiiselect("Selecciona los criterios de evaluación:", list(criterios.keys()))
+criterios_seleccionados = st.multiselect("Selecciona los criterios de evaluación:", list(criterios.keys()))
 
 for criterio in criterios_seleccionados:
     with st.beta_expander(f"Definición de {criterio}"):

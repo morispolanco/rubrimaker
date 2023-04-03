@@ -1,0 +1,17 @@
+# Archivos y directorios generados por Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos y directorios generados por el entorno virtual
+venv/
+*.log
+*.pot
+*.pyc
+
+# Archivos y directorios generados por Streamlit
+streamlit_app_*.html
+
+# Archivo .env para variables de entorno
+.env

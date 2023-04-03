@@ -4,6 +4,13 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+from dotenv import load_dotenv
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
+
+# Asigna la clave API de OpenAI
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 # Función para crear el PDF
 # Define la función que crea la rúbrica
@@ -37,7 +44,6 @@ def crear_rubrica():
 
 # Función para calificar ensayos utilizando GPT
 def calificar_ensayo(ensayo, rubrica, criterios):
-    openai.api_key = "your_openai_api_key"
     model_engine = "text-davinci-003"
     
     prompt = f"Calificar el siguiente ensayo según la rúbrica proporcionada:\n\n{ensayo}\n\nRubrica:\n"

@@ -23,7 +23,7 @@ def crear_pdf_rubrica(pesos, criterios):
         ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
         ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, 0),         (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, 0), 14),
         ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
         ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
@@ -68,4 +68,4 @@ if st.button("Descargar rúbrica en PDF"):
         archivo_pdf = crear_pdf_rubrica(pesos, criterios)
         with open(archivo_pdf, "rb") as f:
             pdf_data = f.read()
-        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf") 
+        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")

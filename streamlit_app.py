@@ -5,6 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from dotenv import load_dotenv
+import os
 
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()

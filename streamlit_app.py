@@ -1,118 +1,56 @@
 import streamlit as st
+import docx2txt
 import openai
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib import colors
-from reportlab.lib.units import inch
-from dotenv import load_dotenv
-import os
 
-# Carga las variables de entorno desde el archivo .env
-load_dotenv()
+# Configuración de Streamlit
+st.set_page_config(page_title="Calificador de Ensayos con GPT-3")
 
-# Asigna la clave API de OpenAI
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+# Título de la aplicación
+st.title("Calificador de Ensayos con GPT-3")
 
-# Función para crear el PDF
-# Define la función que crea la rúbrica
-def crear_rubrica():
-    st.header("Creación de la rúbrica")
-    st.write("Seleccione los criterios de evaluación y asigne un peso a cada uno.")
-    pesos = {}
+# Descripción de la aplicación
+st.write("""
+Esta aplicación permite crear una rúbrica para calificar ensayos según diferentes criterios y usar la API de GPT-3 para calificar los ensayos de acuerdo con los criterios seleccionados.
 
-    # Obtiene la descripción de cada criterio
-    criterios = {
-        "Contenido": "¿El trabajo cumple con los requisitos del proyecto? ¿Está completo y bien desarrollado?",
-        "Comprensión": "¿El estudiante comprende el tema y puede explicarlo en sus propias palabras?",
-        "Precisión": "¿Hay errores en la información presentada? ¿La información es correcta y precisa?",
-        "Creatividad": "¿El trabajo demuestra originalidad y creatividad? ¿El estudiante ha utilizado ideas y técnicas nuevas y únicas para crear el trabajo?",
-        "Organización": "¿El trabajo está organizado y bien estructurado? ¿Hay una introducción, desarrollo y conclusión clara?",
-        "Presentación": "¿El trabajo está presentado de manera profesional y limpia? ¿Se ha utilizado una presentación adecuada para el proyecto, como imágenes, gráficos y diseños?",
-        "Coherencia": "¿Hay una conexión clara entre las diferentes partes del trabajo? ¿El trabajo tiene un flujo lógico y coherente?",
-        "Habilidad técnica": "¿El estudiante ha utilizado habilidades técnicas apropiadas para el proyecto, como gramática, ortografía y puntuación adecuadas?",
-        "Investigación": "¿El estudiante ha investigado adecuadamente el tema? ¿Se ha utilizado una variedad de fuentes, incluyendo fuentes confiables?",
-        "Participación": "¿El estudiante ha participado activamente en el proyecto y ha contribuido significativamente al trabajo en equipo?"
-    }
+Seleccione los criterios y su peso y cargue el archivo de Word con el ensayo que desea calificar. Luego, haga clic en el botón "Calificar ensayo" para obtener el resultado de la calificación.
 
-    # Selecciona el peso de cada criterio
-    for criterio in criterios:
-        peso = st.slider(criterio, 0, 100, step=5)
-        pesos[criterio] = peso
+Nota: Debe proporcionar su propia API Key de OpenAI para utilizar la API de GPT-3. Puede obtener su propia API Key en https://beta.openai.com/signup/.
+""")
 
-    # Crea la rúbrica
-    if st.button("Descargar rúbrica en PDF"):
-        crear_pdf_rubrica(pesos, criterios)
+# Seleccionar los criterios y asignar un peso
+st.header("Criterios de la rúbrica")
+contenido = st.selectbox("Contenido", [1, 2, 3, 4, 5])
+comprension = st.selectbox("Comprensión", [1, 2, 3, 4, 5])
+precision = st.selectbox("Precisión", [1, 2, 3, 4, 5])
+creatividad = st.selectbox("Creatividad", [1, 2, 3, 4, 5])
+organizacion = st.selectbox("Organización", [1, 2, 3, 4, 5])
+presentacion = st.selectbox("Presentación", [1, 2, 3, 4, 5])
+coherencia = st.selectbox("Coherencia", [1, 2, 3, 4, 5])
+habilidad_tecnica = st.selectbox("Habilidad técnica", [1, 2, 3, 4, 5])
+investigacion = st.selectbox("Investigación", [1, 2, 3, 4, 5])
+participacion = st.selectbox("Participación", [1, 2, 3, 4, 5])
 
-# Función para calificar ensayos utilizando GPT
-def calificar_ensayo(ensayo, rubrica, criterios):
-    model_engine = "text-davinci-003"
-    
-    prompt = f"Calificar el siguiente ensayo según la rúbrica proporcionada:\n\n{ensayo}\n\nRubrica:\n"
-    for criterio in rubrica:
-        prompt += f"{criterio}: {criterios[criterio]}\n"
-
-    response = openai.Completion.create(
-        engine=model_engine,
-        prompt=prompt,
-        max_tokens=100,
-        n=1,
-        stop=None,
-        temperature=0.5,
-    )
-
-    result = response.choices[0].text.strip()
-    return result
-st.title("RubriMaker")
-
-criterios = {
-    # Aquí van todos los criterios y sus descripciones
-}
-
-criterios_seleccionados = st.multiselect("Selecciona los criterios de evaluación:", list(criterios.keys()))
-
-for criterio in criterios_seleccionados:
-    with st.beta_expander(f"Definición de {criterio}"):
-        st.write(criterios[criterio])
-
-pesos = {}
-for criterio in criterios_seleccionados:
-    pesos[criterio] = st.slider(f"Asigna un peso a {criterio} (%):", 0, 100, 0)
-
-if st.button("Generar rúbrica", key="generar_rubrica"):
-    st.header("Rúbrica generada")
-    total = sum(pesos.values())
-    if total != 100:
-        st.error("La suma de los pesos debe ser igual al 100%.")
-    else:
-        for criterio, peso in pesos.items():
-            st.write(f"{criterio}: {peso}%")
-
-if st.button("Descargar rúbrica en PDF", key="descargar_rubrica"):
-    total = sum(pesos.values())
-    if total != 100:
-        st.error("La suma de los pesos debe ser igual al 100%.")
-    else:
-        archivo_pdf = crear_pdf_rubrica(pesos, criterios)
-        with open(archivo_pdf, "rb") as f:
-            pdf_data = f.read()
-        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")
-
-uploaded_file = st.file_uploader("Sube un archivo de texto con el ensayo (.txt):", type="txt")
+# Cargar archivo de Word
+uploaded_file = st.file_uploader("Cargar archivo de Word", type="docx")
 
 if uploaded_file is not None:
-    ensayo = uploaded_file.read().decode("utf-8")
-    if st.button("Calificar ensayo", key="calificar_ensayo"):
-        total = sum(pesos.values())
-        if total != 100:
-            st.error("La suma de los pesos debe ser igual al 100%.")
-        else:
-            calificaciones = calificar_ensayo(ensayo, pesos.keys(), criterios)
-            st.write(calificaciones)
+    # Leer el contenido del archivo de Word
+    docx_text = docx2txt.process(uploaded_file)
+    
+    # Llamar a la API de GPT-3 para evaluar el contenido del ensayo
+    openai.api_key = "API_KEY" # Reemplazar con tu propia API Key
+    prompt = f"Calificar ensayo según los criterios seleccionados:\n\nContenido: {contenido}\nComprensión: {comprension}\nPrecisión: {precision}\nCreatividad: {creatividad}\nOrganización: {organizacion}\nPresentación: {presentacion}\nCoherencia: {coherencia}\nHabilidad técnica: {habilidad_tecnica}\nInvestigación: {investigacion}\nParticipación: {participacion}\n\nEnsayo
+response = openai.Completion.create(
+    engine="text-davinci-003",
+    prompt=prompt,
+    temperature=0.5,
+    max_tokens=1024,
+    n=1,
+    stop=None,
+    timeout=10,
+)
+result = response.choices[0].text
 
-if st.button("Descargar rúbrica en PDF"):
-    total = sum(pesos.values())
-    if total != 100:
-        st.error("La suma de los pesos debe ser igual al 100%.")
-    else:
-        archivo_pdf = crear_pdf_rubrica(pesos, criterios)
-        st.download_button("Descargar PDF", archivo_pdf, "rubrica.pdf", "application/pdf")
+# Mostrar el resultado de la calificación
+st.header("Resultado de la calificación")
+st.write(result)

@@ -1,53 +1,34 @@
 import streamlit as st
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.lib import colors
+import openai
+from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.units import inch
 
+# Función para crear el PDF
 def crear_pdf_rubrica(pesos, criterios):
     archivo_pdf = "rubrica.pdf"
     doc = SimpleDocTemplate(archivo_pdf, pagesize=letter)
 
-    styles = getSampleStyleSheet()
-    style = styles["BodyText"]
-    style.wordWrap = "CJK"
+    # El resto del código de la función no cambia...
 
-    data = [["Criterio", "Peso", "Descripción", "Punteo"]]
-    for criterio, peso in pesos.items():
-        descripcion = Paragraph(criterios[criterio], style)
-        data.append([criterio, f"{peso}%", descripcion, ""])
+# Función para calificar ensayos utilizando GPT
+def calificar_ensayo(ensayo, rubrica, criterios):
+    openai.api_key = "tu_api_key_aqui"
 
-    table = Table(data)
+    calificaciones = {}
+    for criterio in rubrica:
+        prompt = f"Evalúa el siguiente ensayo basado en el criterio '{criterio}': {criterios[criterio]}\n\nEnsayo:\n{ensayo}\n\nCalificación:"
+        response = openai.Completion.create(engine="text-davinci-002", prompt=prompt, max_tokens=10, n=1, stop=None, temperature=0.5)
+        calificacion = response.choices[0].text.strip()
+        calificaciones[criterio] = calificacion
 
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, 0), 14),
-        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
-        ("GRID", (0, 0), (-1, -1), 1, colors.black),
-        ("VALIGN", (0, 1), (-1, -1), "MIDDLE")
-    ]))
-
-    doc.build([table])
-
-    return archivo_pdf
+    return calificaciones
 
 st.title("RubriMaker")
 
 criterios = {
-    "Contenido": "¿El trabajo cumple con los requisitos del proyecto? ¿Está completo y bien desarrollado?",
-    "Comprensión": "¿El estudiante comprende el tema y puede explicarlo en sus propias palabras?",
-    "Precisión": "¿Hay errores en la información presentada? ¿La información es correcta y precisa?",
-    "Creatividad": "¿El trabajo demuestra originalidad y creatividad? ¿El estudiante ha utilizado ideas y técnicas nuevas y únicas para crear el trabajo?",
-    "Organización": "¿El trabajo está organizado y bien estructurado? ¿Hay una introducción, desarrollo y conclusión clara?",
-    "Presentación": "¿El trabajo está presentado de manera profesional y limpia? ¿Se ha utilizado una presentación adecuada para el proyecto, como imágenes, gráficos y diseños?",
-    "Coherencia": "¿Hay una conexión clara entre las diferentes partes del trabajo? ¿El trabajo tiene un flujo lógico y coherente?",
-    "Habilidad técnica": "¿El estudiante ha utilizado habilidades técnicas apropiadas para el proyecto, como gramática, ortografía y puntuación adecuadas?",
-    "Investigación": "¿El estudiante ha investigado adecuadamente el tema? ¿Se ha utilizado una variedad de fuentes, incluyendo fuentes confiables?",
-    "Participación": "¿El estudiante ha participado activamente en el proyecto y ha contribuido significativamente al trabajo en equipo?"
+    # Aquí van todos los criterios y sus descripciones
 }
 
 criterios_seleccionados = st.multiselect("Selecciona los criterios de evaluación:", list(criterios.keys()))
@@ -60,7 +41,7 @@ pesos = {}
 for criterio in criterios_seleccionados:
     pesos[criterio] = st.slider(f"Asigna un peso a {criterio} (%):", 0, 100, 0)
 
-if st.button("Generar rúbrica"):
+if st.button("Generar rúbrica", key="generar_rubrica"):
     st.header("Rúbrica generada")
     total = sum(pesos.values())
     if total != 100:
@@ -69,7 +50,7 @@ if st.button("Generar rúbrica"):
         for criterio, peso in pesos.items():
             st.write(f"{criterio}: {peso}%")
 
-if st.button("Descargar rúbrica en PDF"):
+if st.button("Descargar rúbrica en PDF", key="descargar_rubrica"):
     total = sum(pesos.values())
     if total != 100:
         st.error("La suma de los pesos debe ser igual al 100%.")
@@ -79,3 +60,14 @@ if st.button("Descargar rúbrica en PDF"):
             pdf_data = f.read()
         st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")
 
+uploaded_file = st.file_uploader("Sube un archivo de texto con el ensayo (.txt):", type="txt")
+
+if uploaded_file is not None:
+    ensayo = uploaded_file.read().decode("utf-8")
+    if st.button("Calificar ensayo", key="calificar_ensayo"):
+        total = sum(pesos.values())
+        if total != 100:
+            st.error("La suma de los pesos debe ser igual al 100%.")
+        else:
+            calificaciones = calificar_ensayo(ensayo, pesos keys(), criterios)
+st.write(calificaciones)

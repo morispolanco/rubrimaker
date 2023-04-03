@@ -68,4 +68,4 @@ if st.button("Descargar rúbrica en PDF"):
         archivo_pdf = crear_pdf_rubrica(pesos, criterios)
         with open(archivo_pdf, "rb") as f:
             pdf_data = f.read()
-        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf")
+        st.download_button("Descargar rúbrica", pdf_data, "rubrica.pdf", "application/pdf") 

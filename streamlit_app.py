@@ -1,21 +1,19 @@
 import streamlit as st
 import openai
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
 # Función para crear el PDF
 def crear_pdf_rubrica(pesos, criterios):
-    archivo_pdf = "rubrica.pdf"
-    doc = SimpleDocTemplate(archivo_pdf, pagesize=letter)
-
-    data = [["Criterio", "Peso", "Punteo", "Descripción"]]
+    pdf = SimpleDocTemplate("rubrica.pdf", pagesize=letter)
+    data = [["Criterio", "Descripción", "Peso", "Punteo"]]
+    
     for criterio, peso in pesos.items():
-        data.append([criterio, f"{peso}%", "", criterios[criterio]])
+        data.append([criterio, criterios[criterio], f"{peso}%", ""])
 
-    table = Table(data, colWidths=[1.5 * inch, 1 * inch, 1 * inch, 2.5 * inch])
-
+    table = Table(data)
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -24,29 +22,31 @@ def crear_pdf_rubrica(pesos, criterios):
         ('FONTSIZE', (0, 0), (-1, 0), 14),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 12),
-        ('TOPPADDING', (0, 1), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
     ]))
 
-    doc.build([table])
-
-    return archivo_pdf
+    pdf.build([table])
 
 # Función para calificar ensayos utilizando GPT
 def calificar_ensayo(ensayo, rubrica, criterios):
-    openai.api_key = "tu_api_key_aqui"
-
-    calificaciones = {}
+    openai.api_key = "your_openai_api_key"
+    model_engine = "text-davinci-002"
+    
+    prompt = f"Calificar el siguiente ensayo según la rúbrica proporcionada:\n\n{ensayo}\n\nRubrica:\n"
     for criterio in rubrica:
-        prompt = f"Evalúa el siguiente ensayo basado en el criterio '{criterio}': {criterios[criterio]}\n\nEnsayo:\n{ensayo}\n\nCalificación:"
-        response = openai.Completion.create(engine="text-davinci-002", prompt=prompt, max_tokens=10, n=1, stop=None, temperature=0.5)
-        calificacion = response.choices[0].text.strip()
-        calificaciones[criterio] = calificacion
+        prompt += f"{criterio}: {criterios[criterio]}\n"
 
-    return calificaciones
+    response = openai.Completion.create(
+        engine=model_engine,
+        prompt=prompt,
+        max_tokens=100,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+
+    result = response.choices[0].text.strip()
+    return result
 st.title("RubriMaker")
 
 criterios = {

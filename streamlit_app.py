@@ -38,7 +38,7 @@ def crear_rubrica():
 # Función para calificar ensayos utilizando GPT
 def calificar_ensayo(ensayo, rubrica, criterios):
     openai.api_key = "your_openai_api_key"
-    model_engine = "text-davinci-002"
+    model_engine = "text-davinci-003"
     
     prompt = f"Calificar el siguiente ensayo según la rúbrica proporcionada:\n\n{ensayo}\n\nRubrica:\n"
     for criterio in rubrica:

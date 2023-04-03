@@ -47,7 +47,6 @@ def calificar_ensayo(ensayo, rubrica, criterios):
         calificaciones[criterio] = calificacion
 
     return calificaciones
-
 st.title("RubriMaker")
 
 criterios = {
@@ -90,8 +89,4 @@ if uploaded_file is not None:
     if st.button("Calificar ensayo", key="calificar_ensayo"):
         total = sum(pesos.values())
         if total != 100:
-            st.error("La suma de los pesos debe ser igual al 100%.")
-        else:
-            calificaciones = calificar_ensayo(ensayo, pesos.keys(), criterios)
-            st.write(calificaciones)
-
+            st.error("La suma de los pesos debe ser igual al 

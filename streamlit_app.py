@@ -1,6 +1,13 @@
 import streamlit as st
 import docx2txt
 import openai
+from dotenv import load_dotenv
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
+
+# Asigna la clave API de OpenAI
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 # Configuración de Streamlit
 st.set_page_config(page_title="Calificador de Ensayos con GPT-3")
@@ -34,9 +41,6 @@ uploaded_file = st.file_uploader("Cargar archivo de Word", type="docx")
 if uploaded_file is not None:
     # Leer el contenido del archivo de Word
     docx_text = docx2txt.process(uploaded_file)
-
-    # Llamar a la API de GPT-3 para evaluar el contenido del ensayo
-    openai.api_key = "API_KEY"  # Reemplazar con tu propia API Key
 
     prompt = f"""Calificar ensayo según los criterios seleccionados:
 

@@ -39,9 +39,9 @@ if uploaded_file is not None:
     
     # Llamar a la API de GPT-3 para evaluar el contenido del ensayo
     openai.api_key = "API_KEY" # Reemplazar con tu propia API Key
-    prompt = f"Calificar ensayo según los criterios seleccionados:\n\nContenido: {contenido}\nComprensión: {comprension}\nPrecisión: {precision}\nCreatividad: {creatividad}\nOrganización: {organizacion}\nPresentación: {presentacion}\nCoherencia: {coherencia}\nHabilidad técnica: {habilidad_tecnica}\nInvestigación: {investigacion}\nParticipación: {participacion}\n\nEnsayo
-response = openai.Completion.create(
-    engine="text-davinci-003",
+    prompt = f"Calificar ensayo según los criterios seleccionados:\n\nContenido: {contenido}\nComprensión: {comprension}\nPrecisión: {precision}\nCreatividad: {creatividad}\nOrganización: {organizacion}\nPresentación: {presentacion}\nCoherencia: {coherencia}\nHabilidad técnica: {habilidad_tecnica}\nInvestigación: {investigacion}\nParticipación: {participacion}\n\nEnsayo: {docx_text}"
+    response = openai.Completion.create(
+    engine="davinci",
     prompt=prompt,
     temperature=0.5,
     max_tokens=1024,
@@ -54,3 +54,4 @@ result = response.choices[0].text
 # Mostrar el resultado de la calificación
 st.header("Resultado de la calificación")
 st.write(result)
+

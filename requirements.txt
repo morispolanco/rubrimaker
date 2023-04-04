@@ -2,3 +2,4 @@ streamlit
 reportlab
 openai
 python-dotenv
+docx2txt

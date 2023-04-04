@@ -2,10 +2,6 @@ import streamlit as st
 import docx2txt
 import openai
 import os
-from dotenv import load_dotenv
-
-# Carga las variables de entorno desde el archivo .env
-load_dotenv()
 
 # Asigna la clave API de OpenAI
 openai.api_key = os.environ.get("OPENAI_API_KEY")

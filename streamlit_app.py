@@ -1,6 +1,7 @@
 import streamlit as st
 import docx2txt
 import openai
+import os
 from dotenv import load_dotenv
 
 # Carga las variables de entorno desde el archivo .env

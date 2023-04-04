@@ -10,9 +10,7 @@ st.title("Calificador de Ensayos con GPT-3")
 
 # Descripción de la aplicación
 st.write("""
-Esta aplicación permite crear una rúbrica para calificar ensayos según diferentes criterios y usar la API de GPT-3 para calificar los ensayos de acuerdo con los criterios seleccionados.
-
-Seleccione los criterios y su peso y cargue el archivo de Word con el ensayo que desea calificar. Luego, haga clic en el botón "Calificar ensayo" para obtener el resultado de la calificación.
+Esta aplicación permite crear una rúbrica para calificar ensayos según diferentes criterios y usar la API de GPT-3 para calificar los ensayos de acuerdo con los criterios seleccionados. Seleccione los criterios y su peso y cargue el archivo de Word con el ensayo que desea calificar. Luego, haga clic en el botón "Calificar ensayo" para obtener el resultado de la calificación.
 
 Nota: Debe proporcionar su propia API Key de OpenAI para utilizar la API de GPT-3. Puede obtener su propia API Key en https://beta.openai.com/signup/.
 """)
@@ -36,22 +34,37 @@ uploaded_file = st.file_uploader("Cargar archivo de Word", type="docx")
 if uploaded_file is not None:
     # Leer el contenido del archivo de Word
     docx_text = docx2txt.process(uploaded_file)
-    
+
     # Llamar a la API de GPT-3 para evaluar el contenido del ensayo
-    openai.api_key = "API_KEY" # Reemplazar con tu propia API Key
-    prompt = f"Calificar ensayo según los criterios seleccionados:\n\nContenido: {contenido}\nComprensión: {comprension}\nPrecisión: {precision}\nCreatividad: {creatividad}\nOrganización: {organizacion}\nPresentación: {presentacion}\nCoherencia: {coherencia}\nHabilidad técnica: {habilidad_tecnica}\nInvestigación: {investigacion}\nParticipación: {participacion}\n\nEnsayo: {docx_text}"
+    openai.api_key = "API_KEY"  # Reemplazar con tu propia API Key
+
+    prompt = f"""Calificar ensayo según los criterios seleccionados:
+
+Contenido: {contenido}
+Comprensión: {comprension}
+Precisión: {precision}
+Creatividad: {creatividad}
+Organización: {organizacion}
+Presentación: {presentacion}
+Coherencia: {coherencia}
+Habilidad técnica: {habilidad_tecnica}
+Investigación: {investigacion}
+Participación: {participacion}
+
+Ensayo: {docx_text}"""
+
     response = openai.Completion.create(
-    engine="davinci",
-    prompt=prompt,
-    temperature=0.5,
-    max_tokens=1024,
-    n=1,
-    stop=None,
-    timeout=10,
-)
-result = response.choices[0].text
+        engine="davinci",
+        prompt=prompt,
+        temperature=0.5,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        timeout=10,
+    )
 
-# Mostrar el resultado de la calificación
-st.header("Resultado de la calificación")
-st.write(result)
+    result = response.choices[0].text
 
+    # Mostrar el resultado de la calificación
+    st.header("Resultado de la calificación")
+    st.write(result)
